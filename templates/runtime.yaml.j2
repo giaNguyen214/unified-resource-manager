@@ -1,0 +1,108 @@
+apiVersion: {% if kind == "Job" %}batch/v1{% elif kind in ["Deployment","StatefulSet"] %}apps/v1{% else %}v1{% endif %}
+kind: {{ kind }}
+metadata:
+  name: {{ name }}-{{ job_id }}
+
+spec:
+{% if kind == "Job" %}
+  template:
+    spec:
+      restartPolicy: Never
+{% elif kind == "StatefulSet" %}
+  serviceName: {{ name }}-{{ job_id }}
+  selector:
+    matchLabels:
+      app: {{ name }}-{{ job_id }}
+  template:
+    metadata:
+      labels:
+        app: {{ name }}-{{ job_id }}
+    spec:
+{% elif kind == "Deployment" %}
+  selector:
+    matchLabels:
+      app: {{ name }}-{{ job_id }}
+  template:
+    metadata:
+      labels:
+        app: {{ name }}-{{ job_id }}
+    spec:
+{% else %}
+  containers:
+{% endif %}
+
+{% if kind != "Pod" %}
+      schedulerName: yunikorn
+{% endif %}
+
+{% if compute and has_code %}
+      volumes:
+      - name: code
+        hostPath:
+          path: /mnt/jobs/code
+          type: Directory
+      - name: env
+        emptyDir: {}
+
+      initContainers:
+      - name: env-builder
+        image: ubuntu:22.04
+        command: ["/bin/bash","-c"]
+        args:
+          - |
+            apt update && apt install -y python3 python3-pip git cmake build-essential wget curl {% for p in os_pkgs %} {{ p }} {% endfor %}
+
+            pip3 install {% for p in py_pkgs %} {{ p }} {% endfor %}
+
+{% for s in sources %}
+            git clone {{ s.repo }} /tmp/src
+            cd /tmp/src
+{% for b in s.build %}
+            {{ b }}
+{% endfor %}
+{% endfor %}
+
+            cp -r /usr/local/* /env/ || true
+
+        volumeMounts:
+        - name: env
+          mountPath: /env
+
+{% endif %}
+
+      containers:
+      - name: {{ name }}
+        image: {{ image }}
+
+{% if compute and has_code %}
+        command: ["python3","/code/{{ entrypoint }}"]
+        volumeMounts:
+        - name: code
+          mountPath: /code
+        - name: env
+          mountPath: /usr/local
+{% endif %}
+
+{% if compute %}
+        resources:
+          requests:
+            cpu: "{{ resources.cpu }}"
+            memory: "{{ resources.ram }}"
+{% if resources.gpu %}
+            nvidia.com/gpu: {{ resources.gpu }}
+{% endif %}
+          limits:
+            cpu: "{{ resources.cpu }}"
+            memory: "{{ resources.ram }}"
+{% if resources.gpu %}
+            nvidia.com/gpu: {{ resources.gpu }}
+{% endif %}
+{% else %}
+        resources:
+          requests:
+            cpu: "{{ resources.cpu }}"
+            memory: "{{ resources.ram }}"
+          limits:
+            cpu: "{{ resources.cpu }}"
+            memory: "{{ resources.ram }}"
+{% endif %}
