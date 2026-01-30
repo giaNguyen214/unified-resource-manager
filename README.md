@@ -1,15 +1,21 @@
-├ api/ # API layer (job submission endpoint)
-│ └ server.py
+```
+project/
 │
-├ core/ # Core execution pipeline
-│ ├ parser.py # Read & parse job.yaml
-│ ├ manifest.py # Generate Kubernetes YAML
-│ └ submit.py # kubectl apply controller
+├── api/
+│   └── server.py                # API layer (job submission endpoint)
 │
-├ templates/ # Kubernetes template
-│ └ runtime.yaml.j2 # Universal template
+├── core/
+│   ├── parser.py                # Read & parse job.yaml
+│   ├── manifest.py              # Generate Kubernetes YAML
+│   └── submit.py                # kubectl apply controller
 │
-├ jobs/ # User input
-│ ├ job.yaml # Environment & runtime spec (user write this file and submit to the system )
-│ └ code/ # User code file
-| └ main.py
+├── templates/
+│   └── runtime.yaml.j2          # Universal Kubernetes template
+│
+├── jobs/
+│   ├── job.yaml                 # Environment & runtime spec (user submits this file)
+│   └── code/
+│       └── main.py              # User code
+│
+└── README.md
+```
