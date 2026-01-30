@@ -26,9 +26,20 @@ def is_service(image: str):
     img = image.lower()
     return any(k in img for k in SERVICE_IMAGES)
 
+import re
+
+def k8s_name(image: str):
+    name = image.lower()
+    name = name.replace("/", "-").replace(":", "-")
+    name = re.sub(r"[^a-z0-9-]", "-", name)   # thay mọi ký tự không hợp lệ (., _, +, ...)
+    name = re.sub(r"-+", "-", name)           # gộp nhiều dấu -
+    name = name.strip("-")                    # bỏ - đầu/cuối
+    return name
+
 def gen(job, job_id):
     t = open("templates/runtime.yaml.j2").read()
-    template = Template(t)
+    template = Template(t, trim_blocks=True, lstrip_blocks=True)
+
 
     yamls = []
     has_code = os.path.exists("jobs/code")
@@ -36,6 +47,8 @@ def gen(job, job_id):
     os_pkgs = []
     py_pkgs = []
     sources = []
+    
+    namespace = f"job-{job_id}"
 
     for item in job.get("install", []):
         if item["type"] == "os_pkg":
@@ -58,7 +71,8 @@ def gen(job, job_id):
         data = {
             "kind": kind,
             "job_id": job_id,
-            "name": image.replace("/", "-").replace(":", "-"),
+            "namespace": namespace,
+            "name": k8s_name(image),
             "image": image,
             "resources": job["resources"],
             "entrypoint": job.get("entrypoint", "main.py"),

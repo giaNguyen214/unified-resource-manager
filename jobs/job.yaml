@@ -3,7 +3,6 @@ job_type: bigdata # ai | hpc | bigdata
 resources:
   cpu: 4
   ram: 8Gi
-  gpu: 1
 entrypoint: main.py
 
 install:
@@ -21,23 +20,19 @@ install:
 
   # ================= type: container =================
   - type: container
-    image: mpioperator/openmpi:latest
+    image: mpioperator/openmpi:v0.6.0
     kind: Job
 
   - type: container
-    image: bitnami/spark:3.5
-    kind: Job
+    image: spark:3.5.7
+    kind: Deployment
 
   - type: container
-    image: flink:1.18
-    kind: Job
+    image: flink:1.20.3-scala_2.12-java17
+    kind: Deployment
 
   - type: container
-    image: bitnami/kafka:latest
-    kind: StatefulSet
-
-  - type: container
-    image: bitnami/hadoop:latest
+    image: apache/kafka:4.1.1
     kind: StatefulSet
 
   - type: container
@@ -47,14 +42,6 @@ install:
   - type: container
     image: pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime
     kind: Job
-
-  - type: container
-    image: redis:7
-    kind: StatefulSet
-
-  - type: container
-    image: postgres:16
-    kind: StatefulSet
 
   # ================= type: language package =================
   - type: lang_pkg

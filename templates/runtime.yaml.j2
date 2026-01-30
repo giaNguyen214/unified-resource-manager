@@ -1,7 +1,9 @@
-apiVersion: {% if kind == "Job" %}batch/v1{% elif kind in ["Deployment","StatefulSet"] %}apps/v1{% else %}v1{% endif %}
+apiVersion: {% if kind == "Job" %}batch/v1{% elif kind in ["Deployment","StatefulSet"] %}apps/v1{% else %}v1{% endif %}{{ "\n" }}
 kind: {{ kind }}
+
 metadata:
   name: {{ name }}-{{ job_id }}
+  namespace: job-{{ job_id }}
 
 spec:
 {% if kind == "Job" %}
@@ -67,7 +69,6 @@ spec:
         volumeMounts:
         - name: env
           mountPath: /env
-
 {% endif %}
 
       containers:
@@ -83,7 +84,6 @@ spec:
           mountPath: /usr/local
 {% endif %}
 
-{% if compute %}
         resources:
           requests:
             cpu: "{{ resources.cpu }}"
@@ -96,13 +96,4 @@ spec:
             memory: "{{ resources.ram }}"
 {% if resources.gpu %}
             nvidia.com/gpu: {{ resources.gpu }}
-{% endif %}
-{% else %}
-        resources:
-          requests:
-            cpu: "{{ resources.cpu }}"
-            memory: "{{ resources.ram }}"
-          limits:
-            cpu: "{{ resources.cpu }}"
-            memory: "{{ resources.ram }}"
 {% endif %}

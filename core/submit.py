@@ -11,4 +11,19 @@ out = f"job-{job_id}.yaml"
 with open(out, "w") as f:
     f.write(manifest)
 
-subprocess.run(["kubectl", "apply", "-f", out], check=True)
+
+
+# namespace tự sinh theo job_id
+namespace = f"job-{job_id}"
+
+# tạo namespace nếu chưa tồn tại
+if subprocess.call(
+    ["kubectl", "get", "namespace", namespace],
+    stdout=subprocess.DEVNULL,
+    stderr=subprocess.DEVNULL
+) != 0:
+    subprocess.run(["kubectl", "create", "namespace", namespace], check=True)
+
+subprocess.run(["kubectl", "apply", "-f", out, "-n", namespace], check=True)
+
+

@@ -1,19 +1,17 @@
 apiVersion: batch/v1
+
 kind: Job
+
 metadata:
   name: mpioperator-openmpi-latest-demo1
+  namespace: job-demo1
 
 spec:
-
   template:
     spec:
       restartPolicy: Never
 
-
-
       schedulerName: yunikorn
-
-
 
       volumes:
       - name: code
@@ -30,38 +28,18 @@ spec:
         args:
           - |
             apt update && apt install -y python3 python3-pip git cmake build-essential wget curl  openmpi-bin  libssl-dev  build-essential  cmake  git  wget  curl 
-
             pip3 install  tensorflow  torch  xgboost  scikit-learn  ray  dask 
-
-
-            git clone https://github.com/dmlc/xgboost.git /tmp/src
-            cd /tmp/src
-
-            mkdir build
-
-            cd build
-
-            cmake ..
-
-            make -j4
-
-            make install
-
-
 
             cp -r /usr/local/* /env/ || true
 
         volumeMounts:
         - name: env
           mountPath: /env
-
-
 
       containers:
       - name: mpioperator-openmpi-latest
         image: mpioperator/openmpi:latest
 
-
         command: ["python3","/code/main.py"]
         volumeMounts:
         - name: code
@@ -69,187 +47,171 @@ spec:
         - name: env
           mountPath: /usr/local
 
-
-
         resources:
           requests:
             cpu: "4"
             memory: "8Gi"
-
             nvidia.com/gpu: 1
-
           limits:
             cpu: "4"
             memory: "8Gi"
-
             nvidia.com/gpu: 1
-
 
 ---
 apiVersion: batch/v1
+
 kind: Job
+
 metadata:
-  name: bitnami-spark-3.5-demo1
+  name: bitnami-spark-3-5-demo1
+  namespace: job-demo1
 
 spec:
-
   template:
     spec:
       restartPolicy: Never
 
-
-
       schedulerName: yunikorn
 
 
-
-
       containers:
-      - name: bitnami-spark-3.5
+      - name: bitnami-spark-3-5
         image: bitnami/spark:3.5
 
 
-
-
         resources:
           requests:
             cpu: "4"
             memory: "8Gi"
+            nvidia.com/gpu: 1
           limits:
             cpu: "4"
             memory: "8Gi"
+            nvidia.com/gpu: 1
 
 ---
 apiVersion: batch/v1
+
 kind: Job
+
 metadata:
-  name: flink-1.18-demo1
+  name: flink-1-18-demo1
+  namespace: job-demo1
 
 spec:
-
   template:
     spec:
       restartPolicy: Never
 
-
-
       schedulerName: yunikorn
 
 
-
-
       containers:
-      - name: flink-1.18
+      - name: flink-1-18
         image: flink:1.18
 
 
-
-
         resources:
           requests:
             cpu: "4"
             memory: "8Gi"
+            nvidia.com/gpu: 1
           limits:
             cpu: "4"
             memory: "8Gi"
+            nvidia.com/gpu: 1
 
 ---
 apiVersion: apps/v1
+
 kind: StatefulSet
+
 metadata:
-  name: bitnami-kafka-latest-demo1
+  name: bitnami-kafka-3-6-1-demo1
+  namespace: job-demo1
 
 spec:
-
-  serviceName: bitnami-kafka-latest-demo1
+  serviceName: bitnami-kafka-3-6-1-demo1
   selector:
     matchLabels:
-      app: bitnami-kafka-latest-demo1
+      app: bitnami-kafka-3-6-1-demo1
   template:
     metadata:
       labels:
-        app: bitnami-kafka-latest-demo1
+        app: bitnami-kafka-3-6-1-demo1
     spec:
-
-
 
       schedulerName: yunikorn
 
 
-
-
       containers:
-      - name: bitnami-kafka-latest
-        image: bitnami/kafka:latest
-
-
+      - name: bitnami-kafka-3-6-1
+        image: bitnami/kafka:3.6.1
 
 
         resources:
           requests:
             cpu: "4"
             memory: "8Gi"
+            nvidia.com/gpu: 1
           limits:
             cpu: "4"
             memory: "8Gi"
+            nvidia.com/gpu: 1
 
 ---
 apiVersion: apps/v1
+
 kind: StatefulSet
+
 metadata:
-  name: bitnami-hadoop-latest-demo1
+  name: bitnami-hadoop-3-3-6-demo1
+  namespace: job-demo1
 
 spec:
-
-  serviceName: bitnami-hadoop-latest-demo1
+  serviceName: bitnami-hadoop-3-3-6-demo1
   selector:
     matchLabels:
-      app: bitnami-hadoop-latest-demo1
+      app: bitnami-hadoop-3-3-6-demo1
   template:
     metadata:
       labels:
-        app: bitnami-hadoop-latest-demo1
+        app: bitnami-hadoop-3-3-6-demo1
     spec:
-
-
 
       schedulerName: yunikorn
 
 
-
-
       containers:
-      - name: bitnami-hadoop-latest
-        image: bitnami/hadoop:latest
-
-
+      - name: bitnami-hadoop-3-3-6
+        image: bitnami/hadoop:3.3.6
 
 
         resources:
           requests:
             cpu: "4"
             memory: "8Gi"
+            nvidia.com/gpu: 1
           limits:
             cpu: "4"
             memory: "8Gi"
+            nvidia.com/gpu: 1
 
 ---
 apiVersion: batch/v1
+
 kind: Job
+
 metadata:
-  name: tensorflow-tensorflow-2.15.0-gpu-demo1
+  name: tensorflow-tensorflow-2-15-0-gpu-demo1
+  namespace: job-demo1
 
 spec:
-
   template:
     spec:
       restartPolicy: Never
 
-
-
       schedulerName: yunikorn
-
-
 
       volumes:
       - name: code
@@ -266,24 +228,7 @@ spec:
         args:
           - |
             apt update && apt install -y python3 python3-pip git cmake build-essential wget curl  openmpi-bin  libssl-dev  build-essential  cmake  git  wget  curl 
-
             pip3 install  tensorflow  torch  xgboost  scikit-learn  ray  dask 
-
-
-            git clone https://github.com/dmlc/xgboost.git /tmp/src
-            cd /tmp/src
-
-            mkdir build
-
-            cd build
-
-            cmake ..
-
-            make -j4
-
-            make install
-
-
 
             cp -r /usr/local/* /env/ || true
 
@@ -291,13 +236,10 @@ spec:
         - name: env
           mountPath: /env
 
-
-
       containers:
-      - name: tensorflow-tensorflow-2.15.0-gpu
+      - name: tensorflow-tensorflow-2-15-0-gpu
         image: tensorflow/tensorflow:2.15.0-gpu
 
-
         command: ["python3","/code/main.py"]
         volumeMounts:
         - name: code
@@ -305,39 +247,31 @@ spec:
         - name: env
           mountPath: /usr/local
 
-
-
         resources:
           requests:
             cpu: "4"
             memory: "8Gi"
-
             nvidia.com/gpu: 1
-
           limits:
             cpu: "4"
             memory: "8Gi"
-
             nvidia.com/gpu: 1
-
 
 ---
 apiVersion: batch/v1
+
 kind: Job
+
 metadata:
-  name: pytorch-pytorch-2.1.0-cuda11.8-cudnn8-runtime-demo1
+  name: pytorch-pytorch-2-1-0-cuda11-8-cudnn8-runtime-demo1
+  namespace: job-demo1
 
 spec:
-
   template:
     spec:
       restartPolicy: Never
 
-
-
       schedulerName: yunikorn
-
-
 
       volumes:
       - name: code
@@ -354,24 +288,7 @@ spec:
         args:
           - |
             apt update && apt install -y python3 python3-pip git cmake build-essential wget curl  openmpi-bin  libssl-dev  build-essential  cmake  git  wget  curl 
-
             pip3 install  tensorflow  torch  xgboost  scikit-learn  ray  dask 
-
-
-            git clone https://github.com/dmlc/xgboost.git /tmp/src
-            cd /tmp/src
-
-            mkdir build
-
-            cd build
-
-            cmake ..
-
-            make -j4
-
-            make install
-
-
 
             cp -r /usr/local/* /env/ || true
 
@@ -379,13 +296,10 @@ spec:
         - name: env
           mountPath: /env
 
-
-
       containers:
-      - name: pytorch-pytorch-2.1.0-cuda11.8-cudnn8-runtime
+      - name: pytorch-pytorch-2-1-0-cuda11-8-cudnn8-runtime
         image: pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime
 
-
         command: ["python3","/code/main.py"]
         volumeMounts:
         - name: code
@@ -393,186 +307,12 @@ spec:
         - name: env
           mountPath: /usr/local
 
-
-
         resources:
           requests:
             cpu: "4"
             memory: "8Gi"
-
             nvidia.com/gpu: 1
-
           limits:
             cpu: "4"
             memory: "8Gi"
-
             nvidia.com/gpu: 1
-
-
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: dmlc-xgboost-latest-demo1
-
-spec:
-
-  template:
-    spec:
-      restartPolicy: Never
-
-
-
-      schedulerName: yunikorn
-
-
-
-      volumes:
-      - name: code
-        hostPath:
-          path: /mnt/jobs/code
-          type: Directory
-      - name: env
-        emptyDir: {}
-
-      initContainers:
-      - name: env-builder
-        image: ubuntu:22.04
-        command: ["/bin/bash","-c"]
-        args:
-          - |
-            apt update && apt install -y python3 python3-pip git cmake build-essential wget curl  openmpi-bin  libssl-dev  build-essential  cmake  git  wget  curl 
-
-            pip3 install  tensorflow  torch  xgboost  scikit-learn  ray  dask 
-
-
-            git clone https://github.com/dmlc/xgboost.git /tmp/src
-            cd /tmp/src
-
-            mkdir build
-
-            cd build
-
-            cmake ..
-
-            make -j4
-
-            make install
-
-
-
-            cp -r /usr/local/* /env/ || true
-
-        volumeMounts:
-        - name: env
-          mountPath: /env
-
-
-
-      containers:
-      - name: dmlc-xgboost-latest
-        image: dmlc/xgboost:latest
-
-
-        command: ["python3","/code/main.py"]
-        volumeMounts:
-        - name: code
-          mountPath: /code
-        - name: env
-          mountPath: /usr/local
-
-
-
-        resources:
-          requests:
-            cpu: "4"
-            memory: "8Gi"
-
-            nvidia.com/gpu: 1
-
-          limits:
-            cpu: "4"
-            memory: "8Gi"
-
-            nvidia.com/gpu: 1
-
-
----
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: redis-7-demo1
-
-spec:
-
-  serviceName: redis-7-demo1
-  selector:
-    matchLabels:
-      app: redis-7-demo1
-  template:
-    metadata:
-      labels:
-        app: redis-7-demo1
-    spec:
-
-
-
-      schedulerName: yunikorn
-
-
-
-
-      containers:
-      - name: redis-7
-        image: redis:7
-
-
-
-
-        resources:
-          requests:
-            cpu: "4"
-            memory: "8Gi"
-          limits:
-            cpu: "4"
-            memory: "8Gi"
-
----
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: postgres-16-demo1
-
-spec:
-
-  serviceName: postgres-16-demo1
-  selector:
-    matchLabels:
-      app: postgres-16-demo1
-  template:
-    metadata:
-      labels:
-        app: postgres-16-demo1
-    spec:
-
-
-
-      schedulerName: yunikorn
-
-
-
-
-      containers:
-      - name: postgres-16
-        image: postgres:16
-
-
-
-
-        resources:
-          requests:
-            cpu: "4"
-            memory: "8Gi"
-          limits:
-            cpu: "4"
-            memory: "8Gi"
